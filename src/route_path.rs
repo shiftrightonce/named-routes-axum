@@ -7,7 +7,7 @@ use axum::{
 };
 
 #[derive(Debug, Default, Clone)]
-pub struct Validator;
+pub struct Validator(String);
 
 #[derive(Debug, Default, Clone)]
 pub struct RoutePath {
@@ -16,12 +16,23 @@ pub struct RoutePath {
 }
 
 impl RoutePath {
+    pub fn set_param(&mut self, key: &str, value: impl ToString) -> &mut Self {
+        if self.pieces.is_some() {
+            self.pieces
+                .as_mut()
+                .unwrap()
+                .insert(format!(":{}", key), value.into());
+        }
+
+        self
+    }
+
     pub fn redirect<T: IntoResponse>(&self, raw: T) -> Response<Body> {
         let mut response = raw.into_response();
 
         response.headers_mut().append(
             header::LOCATION,
-            header::HeaderValue::from_str(&self.raw).unwrap(),
+            header::HeaderValue::from_str(self.path().as_str()).unwrap(),
         );
         *response.status_mut() = StatusCode::TEMPORARY_REDIRECT;
         response
@@ -30,7 +41,7 @@ impl RoutePath {
     pub fn redirect_meta(&self) -> String {
         format!(
             "<meta http-equiv=\"Refresh\" content=\"0; URL={}\" />",
-            &self.raw
+            &self.path()
         )
     }
 
@@ -38,16 +49,22 @@ impl RoutePath {
         Builder::new()
             .header(
                 header::LOCATION,
-                header::HeaderValue::from_str(self.generate_clean_path().as_str()).unwrap(),
+                header::HeaderValue::from_str(self.path().as_str()).unwrap(),
             )
             .status(StatusCode::TEMPORARY_REDIRECT)
             .body(body)
             .unwrap()
     }
 
-    fn generate_clean_path(&self) -> String {
-        // TODO: Fill the path variables
-        self.raw.clone()
+    pub fn path(&self) -> String {
+        let mut raw = self.raw.clone();
+        if self.pieces.is_some() {
+            for (k, v) in self.pieces.as_ref().unwrap().iter() {
+                raw = raw.replace(k, v.0.as_str());
+            }
+        }
+
+        raw
     }
 }
 
@@ -65,9 +82,29 @@ impl From<&RoutePath> for String {
 
 impl From<&str> for RoutePath {
     fn from(value: &str) -> Self {
-        Self {
-            raw: value.to_string(),
-            pieces: None,
+        if value.contains(':') {
+            let pieces = value
+                .split('/')
+                .into_iter()
+                .filter(|entry| entry.contains(':'))
+                .map(|entry| (entry.to_string(), Validator::default()))
+                .collect();
+
+            Self {
+                raw: value.to_string(),
+                pieces: Some(pieces),
+            }
+        } else {
+            Self {
+                raw: value.to_string(),
+                pieces: None,
+            }
         }
+    }
+}
+
+impl<T: ToString> From<T> for Validator {
+    fn from(value: T) -> Self {
+        Self(value.to_string())
     }
 }

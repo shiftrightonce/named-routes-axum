@@ -4,12 +4,12 @@ use axum::{
     Router,
 };
 
-use crate::name_repo::NameRepo;
+use crate::NamedRoutesRepo;
 
 #[derive(Debug, Clone)]
 pub struct RouterWrapper<S = ()> {
     router: Router<S>,
-    name_repo: NameRepo,
+    name_repo: NamedRoutesRepo,
 }
 
 impl<S: Clone + Send + Sync + 'static> Default for RouterWrapper<S> {
@@ -57,7 +57,7 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
     }
 
     // TODO: Remove this method!!! when done with the POE
-    pub fn repo(&self) -> &NameRepo {
+    pub fn repo(&self) -> &NamedRoutesRepo {
         &self.name_repo
     }
 
