@@ -1,4 +1,5 @@
 mod name_repo;
+mod redirector;
 mod route_path;
 mod router_wrapper;
 mod service;

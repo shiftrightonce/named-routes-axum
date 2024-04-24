@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use axum::{
     extract::{Path, State},
     response::{Html, IntoResponse},
@@ -9,10 +11,28 @@ async fn main() {
     let state = AppState::default();
 
     // build our application with a route
-    let app = RouterWrapper::new().get("/", handler, "home").get(
-        "/add/:number1/:number2",
-        handle_adding,
-        "add_numbers",
+    let app = RouterWrapper::new()
+        .get("/", handler, "home")
+        .get("/add/:number1/:number2", handle_adding, "add_numbers")
+        .get("/dummy", dummy, "dummy");
+
+    let router2 = RouterWrapper::new().get(
+        "/foo",
+        |State(app): State<AppState>| async move {
+            let mut parts = HashMap::new();
+            parts.insert("number1", 1);
+            parts.insert("number2", 1);
+
+            let path = app
+                .route_service()
+                .get("add_numbers")
+                .unwrap()
+                .with(parts)
+                .path();
+
+            format!("add path is: {}", path)
+        },
+        "foo-route",
     );
 
     // run it
@@ -21,15 +41,23 @@ async fn main() {
         .unwrap();
 
     println!("listening on {}", listener.local_addr().unwrap());
-    axum::serve(listener, app.into_router().with_state(state))
-        .await
-        .unwrap();
+    axum::serve(
+        listener,
+        app.into_router()
+            .merge(router2.into_router())
+            .with_state(state),
+    )
+    .await
+    .unwrap();
+}
+
+async fn dummy(State(app): State<AppState>) -> impl IntoResponse {
+    app.route_service().get("home").unwrap().redirect(())
 }
 
 async fn handler(State(app): State<AppState>) -> impl IntoResponse {
-    if let Some(mut route) = app.route_service().get("add_numbers") {
-        route.set_param("number1", 8).set_param("number2", 55);
-        return route.redirect(Html("Redirecting"));
+    if let Some(route) = app.route_service().get("add_numbers") {
+        return route.with(vec![400, 1000]).redirect(Html("Redirecting"));
     }
 
     Html("<h1>Hello world</h1>").into_response()
