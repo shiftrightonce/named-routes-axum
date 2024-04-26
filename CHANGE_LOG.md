@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.3] - 2024-04-26
+
+### 🚀 Features
+
+- Add `name_route` method
+
 ## [0.1.2] - 2024-04-26
 
 ### 🚀 Features
