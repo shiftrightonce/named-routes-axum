@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.2] - 2024-04-26
+
+### 🚀 Features
+
+- Add the ability to merge routers
+
+### Example
+
+- Add examples for `merge` and `noname` routes
+
 ## [0.1.1] - 2024-04-26
 
 ### 🐛 Bug Fixes
