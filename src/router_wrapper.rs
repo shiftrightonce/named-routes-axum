@@ -1,6 +1,6 @@
 use axum::{
     handler::Handler,
-    routing::{delete, get, head, options, patch, post, put, trace},
+    routing::{delete, get, head, options, patch, post, put, trace, MethodRouter},
     Router,
 };
 
@@ -125,6 +125,16 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
     {
         self.name_repo = self.name_repo.register(name, path);
         self.router = self.router.route(path, trace(handler));
+        self
+    }
+
+    pub fn route(mut self, path: &str, handler: MethodRouter<S>) -> Self {
+        self.router = self.router.route(path, handler);
+        self
+    }
+
+    pub fn merge(mut self, wrapper: Self) -> Self {
+        self.router = self.router.merge(wrapper.into_router());
         self
     }
 
