@@ -13,9 +13,9 @@ pub struct NamedRoutesRepo {
 impl Default for NamedRoutesRepo {
     fn default() -> Self {
         Self {
-            repo: Arc::clone(NAME_ROUTES_REPO.get_or_init(|| {
-                return Arc::new(RwLock::new(HashMap::new()));
-            })),
+            repo: Arc::clone(
+                NAME_ROUTES_REPO.get_or_init(|| Arc::new(RwLock::new(HashMap::new()))),
+            ),
         }
     }
 }

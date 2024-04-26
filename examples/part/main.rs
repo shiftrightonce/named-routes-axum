@@ -1,10 +1,9 @@
-use std::collections::HashMap;
-
 use axum::{
     extract::{Path, State},
     response::{Html, IntoResponse},
 };
 use named_routes_axum::{NamedRoutesService, RouterWrapper};
+use rand::Rng;
 
 #[tokio::main]
 async fn main() {
@@ -12,11 +11,9 @@ async fn main() {
     let state = AppState::default();
 
     // 2.  build our application with a route
-    let app = RouterWrapper::new().get("/", handler, "home").get(
-        "/add/:number1/:number2",
-        handle_adding,
-        "add_numbers",
-    );
+    let app = RouterWrapper::new()
+        .get("/", handler, "home")
+        .get("/day/:index", handle_day, "day");
 
     // run it
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
@@ -31,21 +28,30 @@ async fn main() {
 
 async fn handler(State(app): State<AppState>) -> impl IntoResponse {
     // 3. Get the route with name "add_numbers" and redirect to it
-    if let Some(route) = app.route_service().get("add_numbers") {
+    if let Some(route) = app.route_service().get("day") {
         // 4. The route named "add_numbers" as two parts that requires values
-        // these are the values
-        let mut parts = HashMap::new();
-        parts.insert("number1", 1);
-        parts.insert("number2", 2);
+        // these are the values.
+        let part = rand::thread_rng().gen_range(0..6);
 
-        return route.with(parts).redirect(Html("")); // we are creating a response with an empty HTML body
+        return route.with(part.to_string()).redirect(Html("")); // we are creating a response with an empty HTML body
     } else {
         Html("<h1>We could not get the rout named <b>add_numbers</b></h1>").into_response()
     }
 }
 
-async fn handle_adding(Path((number1, number2)): Path<(i32, i32)>) -> Html<String> {
-    Html(format!("{} + {} = {}", number1, number2, number1 + number2))
+async fn handle_day(Path(index): Path<i32>) -> Html<&'static str> {
+    let days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+    ];
+    let unknown = "Unknown";
+
+    Html(days.get(index as usize).unwrap_or(&unknown))
 }
 
 #[derive(Debug, Default, Clone)]

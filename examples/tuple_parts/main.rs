@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use axum::{
     extract::{Path, State},
     response::{Html, IntoResponse},
@@ -33,10 +31,9 @@ async fn handler(State(app): State<AppState>) -> impl IntoResponse {
     // 3. Get the route with name "add_numbers" and redirect to it
     if let Some(route) = app.route_service().get("add_numbers") {
         // 4. The route named "add_numbers" as two parts that requires values
-        // these are the values
-        let mut parts = HashMap::new();
-        parts.insert("number1", 1);
-        parts.insert("number2", 2);
+        // these are the values. Tuple elements are assign to the parts in the order they appear.
+        // In this case 1 is asssign to number1 and 2 to number2
+        let parts = (1, 2);
 
         return route.with(parts).redirect(Html("")); // we are creating a response with an empty HTML body
     } else {

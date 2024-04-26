@@ -1,13 +1,8 @@
-use std::{
-    collections::{BTreeMap, HashMap},
-    fmt::Display,
-    sync::Arc,
-};
+use std::collections::{BTreeMap, HashMap};
 
 use axum::{
     body::Body,
-    http::{response, Response},
-    response::{sse::KeepAlive, Html, IntoResponse},
+    response::{IntoResponse, Response},
 };
 
 use crate::redirector::Redirector;
@@ -29,8 +24,12 @@ impl RoutePath {
             let map = parts.pos.unwrap();
             let mut named_map = HashMap::new();
             for (pos, name) in self.raw.split('/').filter(|p| p.contains(':')).enumerate() {
-                named_map.insert(name.to_string(), map.get(&pos).unwrap().clone());
-                // TODO: Handle when we get back none
+                let value = if let Some(v) = map.get(&pos) {
+                    v.clone()
+                } else {
+                    "".to_string()
+                };
+                named_map.insert(name.to_string(), value);
             }
 
             self.make_redirector(Some(named_map))
@@ -45,6 +44,7 @@ impl RoutePath {
             ))
         }
     }
+
     pub fn has_parts(&self) -> bool {
         self.has_parts
     }
@@ -53,27 +53,20 @@ impl RoutePath {
         self.make_redirector(None).redirect(response)
     }
 
+    pub fn redirect_t<T>(&self, body: T) -> Response<T> {
+        self.make_redirector(None).redirect_t(body)
+    }
+
     pub fn redirect_meta(&self) -> String {
-        format!(
-            "<meta http-equiv=\"Refresh\" content=\"0; URL={}\" />",
-            &self.make_redirector(None).path()
-        )
+        self.make_redirector(None).redirect_meta()
     }
 
-    pub fn make_redirector(&self, parts: Option<HashMap<String, String>>) -> Redirector {
+    pub fn redirector(&self) -> Redirector {
+        self.make_redirector(None)
+    }
+
+    fn make_redirector(&self, parts: Option<HashMap<String, String>>) -> Redirector {
         Redirector::new(&self.raw, parts)
-    }
-}
-
-impl From<&RoutePath> for Html<&'static str> {
-    fn from(value: &RoutePath) -> Self {
-        Html("for now")
-    }
-}
-
-impl From<&RoutePath> for String {
-    fn from(value: &RoutePath) -> Self {
-        value.raw.clone()
     }
 }
 
@@ -86,14 +79,22 @@ impl From<&str> for RoutePath {
     }
 }
 
-// TODO: Implement a macro to handle tuple with 7 values
-impl<V: ToString> From<(V, V)> for PartsValue {
-    fn from(value: (V, V)) -> Self {
+impl From<String> for PartsValue {
+    fn from(value: String) -> Self {
         let mut map = BTreeMap::new();
-        map.insert(0, value.0.to_string());
-        map.insert(1, value.1.to_string());
+        map.insert(0, value);
+        PartsValue {
+            pos: Some(map),
+            name: None,
+        }
+    }
+}
 
-        Self {
+impl From<&str> for PartsValue {
+    fn from(value: &str) -> Self {
+        let mut map = BTreeMap::new();
+        map.insert(0, value.to_string());
+        PartsValue {
             pos: Some(map),
             name: None,
         }
@@ -121,6 +122,64 @@ impl<V: ToString> From<Vec<V>> for PartsValue {
         for (pos, value) in value.into_iter().enumerate() {
             map.insert(pos, value.to_string());
         }
+
+        Self {
+            pos: Some(map),
+            name: None,
+        }
+    }
+}
+
+// TODO: Implement a macro to handle tuple with 7 values
+impl<V: ToString> From<(V,)> for PartsValue {
+    fn from(value: (V,)) -> Self {
+        let mut map = BTreeMap::new();
+        map.insert(0, value.0.to_string());
+
+        Self {
+            pos: Some(map),
+            name: None,
+        }
+    }
+}
+
+// TODO: Remove when proc_macro is implemented
+impl<V: ToString> From<(V, V)> for PartsValue {
+    fn from(value: (V, V)) -> Self {
+        let mut map = BTreeMap::new();
+        map.insert(0, value.0.to_string());
+        map.insert(1, value.1.to_string());
+
+        Self {
+            pos: Some(map),
+            name: None,
+        }
+    }
+}
+
+// TODO: Remove when proc_macro is implemented
+impl<V: ToString> From<(V, V, V)> for PartsValue {
+    fn from(value: (V, V, V)) -> Self {
+        let mut map = BTreeMap::new();
+        map.insert(0, value.0.to_string());
+        map.insert(1, value.1.to_string());
+        map.insert(2, value.2.to_string());
+
+        Self {
+            pos: Some(map),
+            name: None,
+        }
+    }
+}
+
+// TODO: Remove when proc_macro is implemented
+impl<V: ToString> From<(V, V, V, V)> for PartsValue {
+    fn from(value: (V, V, V, V)) -> Self {
+        let mut map = BTreeMap::new();
+        map.insert(0, value.0.to_string());
+        map.insert(1, value.1.to_string());
+        map.insert(2, value.2.to_string());
+        map.insert(3, value.3.to_string());
 
         Self {
             pos: Some(map),

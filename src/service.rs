@@ -3,7 +3,7 @@ use std::{
     sync::{Arc, RwLock},
 };
 
-use crate::{RepoInner, RoutePath, NAME_ROUTES_REPO};
+use crate::{PartsValue, RepoInner, RoutePath, NAME_ROUTES_REPO};
 
 #[derive(Debug, Clone)]
 pub struct NamedRoutesService {
@@ -13,9 +13,9 @@ pub struct NamedRoutesService {
 impl Default for NamedRoutesService {
     fn default() -> Self {
         Self {
-            repo: Arc::clone(NAME_ROUTES_REPO.get_or_init(|| {
-                return Arc::new(RwLock::new(HashMap::new()));
-            })),
+            repo: Arc::clone(
+                NAME_ROUTES_REPO.get_or_init(|| Arc::new(RwLock::new(HashMap::new()))),
+            ),
         }
     }
 }
@@ -27,18 +27,18 @@ impl NamedRoutesService {
 
     pub fn get(&self, name: &str) -> Option<RoutePath> {
         if let Ok(read) = self.repo.read() {
-            return if let Some(v) = read.get(name) {
-                Some(v.clone())
-            } else {
-                None
-            };
+            return read.get(name).cloned();
         } else {
             None
         }
     }
 
-    pub fn get_string(&self, name: &str) -> Option<String> {
-        self.get(name).map(|v| String::from(&v))
+    pub fn get_path(&self, name: &str) -> Option<String> {
+        self.get(name).map(|v| v.redirector().path())
+    }
+
+    pub fn get_path_with<V: Into<PartsValue>>(&self, name: &str, parts: V) -> Option<String> {
+        self.get(name).map(|v| v.with(parts).path())
     }
 
     pub fn has(&self, name: &str) -> bool {
@@ -56,29 +56,11 @@ impl NamedRoutesService {
             HashMap::new()
         }
     }
-
-    pub fn all_as_string(&self) -> HashMap<String, String> {
-        let mut values = HashMap::<String, String>::new();
-        if let Ok(read) = self.repo.read() {
-            for (k, v) in read.iter() {
-                values.insert(k.clone(), v.into());
-            }
-            values
-        } else {
-            values
-        }
-    }
-
-    fn set_repo(mut self, repo: RepoInner) -> Self {
-        self.repo = repo;
-        self
-    }
 }
 
+#[allow(unused_imports)]
 mod test {
-    use crate::NamedRoutesRepo;
-
-    use super::*;
+    use crate::{NamedRoutesRepo, NamedRoutesService};
 
     #[allow(unused)]
     fn setup_name_repo() {
@@ -102,30 +84,30 @@ mod test {
 
         // success tests
         assert_eq!(
-            name_service.get_string("home"),
+            name_service.get_path("home"),
             Some(home_url.clone()),
             "expected /home"
         );
         assert_eq!(
-            name_service.get_string("first"),
+            name_service.get_path("first"),
             Some(first_url.clone()),
             "expected /first"
         );
         assert_eq!(
-            name_service.get_string("second"),
+            name_service.get_path("second"),
             Some(second_url.clone()),
             "expected /second"
         );
 
         // fail tests
         assert_eq!(
-            name_service.get_string("fake1"),
+            name_service.get_path("fake1"),
             None,
             "fake1 was not registered"
         );
-        assert_eq!(name_service.get_string("home-"), None, "home- has a typo");
+        assert_eq!(name_service.get_path("home-"), None, "home- has a typo");
         assert_eq!(
-            name_service.get_string("first route"),
+            name_service.get_path("first route"),
             None,
             "first route has a space"
         );
@@ -137,33 +119,20 @@ mod test {
         let name_service = NamedRoutesService::new();
 
         // success test
-        assert_eq!(name_service.get_string("home"), Some("/".to_string()));
-        assert_eq!(name_service.get_string("first"), Some("/first".to_string()));
-        assert_eq!(
-            name_service.get_string("second"),
-            Some("/second".to_string())
-        );
-        assert_eq!(name_service.get_string("second-foo"), None);
+        assert_eq!(name_service.get_path("home"), Some("/".to_string()));
+        assert_eq!(name_service.get_path("first"), Some("/first".to_string()));
+        assert_eq!(name_service.get_path("second"), Some("/second".to_string()));
+        assert_eq!(name_service.get_path("second-foo"), None);
     }
 
     #[test]
     fn test_getting_all_the_names() {
         setup_name_repo();
         let name_service = NamedRoutesService::new();
-        let all = name_service.all_as_string();
+        let all = name_service.all();
 
         // success
         assert_eq!(all.len(), 3);
-
-        // success tests
-        assert_eq!(all.get("home"), Some("/".to_string()).as_ref());
-        assert_eq!(all.get("first"), Some("/first".to_string()).as_ref());
-        assert_eq!(all.get("second"), Some("/second".to_string()).as_ref());
-        assert_eq!(all.get("second-foo").take(), None);
-
-        // fail tests
-        assert_eq!(all.get("second-foo").take(), None);
-        assert_eq!(all.get("").take(), None);
     }
 
     #[test]
@@ -172,18 +141,15 @@ mod test {
         let name_service2 = NamedRoutesService::new();
 
         // success test
-        assert_eq!(name_service2.get_string("home"), Some("/".to_string()));
+        assert_eq!(name_service2.get_path("home"), Some("/".to_string()));
+        assert_eq!(name_service2.get_path("first"), Some("/first".to_string()));
         assert_eq!(
-            name_service2.get_string("first"),
-            Some("/first".to_string())
-        );
-        assert_eq!(
-            name_service2.get_string("second"),
+            name_service2.get_path("second"),
             Some("/second".to_string())
         );
-        assert_eq!(name_service2.get_string("second-foo"), None);
+        assert_eq!(name_service2.get_path("second-foo"), None);
 
         // fail test
-        assert_eq!(name_service2.get_string("home2"), None);
+        assert_eq!(name_service2.get_path("home2"), None);
     }
 }

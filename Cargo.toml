@@ -10,5 +10,5 @@ edition = "2021"
 axum = { version = "0.7.5", features = ["default"] }
 
 [dev-dependencies]
-busybody = "0.3.8"
 tokio = { version = "1.37.0", features = ["full"] }
+rand = "0.8.5"

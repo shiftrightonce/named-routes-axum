@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use axum::{
     body::Body,
     http::{header, response::Builder, Response, StatusCode},
-    response::{Html, IntoResponse},
+    response::IntoResponse,
 };
 
 #[derive(Debug, Clone)]
@@ -20,6 +20,7 @@ impl Redirector {
         }
     }
 
+    /// Returns a reponse instance that will temporarily redirects client
     pub fn redirect<T: IntoResponse>(&self, response: T) -> Response<Body> {
         let mut response = response.into_response();
 
@@ -31,6 +32,11 @@ impl Redirector {
         response
     }
 
+    /// Returns an html meta tag with a refresh
+    ///
+    /// ```html
+    ///  <meta http-equiv="Refresh" content="0; URL=http::/foo.com" />,
+    /// ```
     pub fn redirect_meta(&self) -> String {
         format!(
             "<meta http-equiv=\"Refresh\" content=\"0; URL={}\" />",
@@ -49,6 +55,7 @@ impl Redirector {
             .unwrap()
     }
 
+    /// Returns the build route's path
     pub fn path(&self) -> String {
         let mut raw = self.raw.clone();
         if self.parts.is_some() {
