@@ -2,6 +2,11 @@
 name = "named_routes_axum"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "Give Axum routes names"
+repository = "https://github.com/shiftrightonce/busybody"
+keywords = ["webdev", "web", "routing", "router", "axum"]
+categories = ["web-programming"]
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
