@@ -41,96 +41,85 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
     }
 
     /// Register a DELETE handler
-    pub fn delete<H, T>(mut self, path: &str, handler: H, name: &str) -> Self
+    pub fn delete<H, T>(self, path: &str, handler: H, name: &str) -> Self
     where
         H: Handler<T, S>,
         T: 'static,
     {
-        self.name_repo = self.name_repo.register(name, path);
-        self.router = self.router.route(path, delete(handler));
-        self
+        self.name_route(path, delete(handler), name)
     }
 
     /// Register a GET handler
-    pub fn get<H, T>(mut self, path: &str, handler: H, name: &str) -> Self
+    pub fn get<H, T>(self, path: &str, handler: H, name: &str) -> Self
     where
         H: Handler<T, S>,
         T: 'static,
     {
-        self.name_repo = self.name_repo.register(name, path);
-        self.router = self.router.route(path, get(handler));
-        self
+        self.name_route(path, get(handler), name)
     }
 
     /// Register a HEAD handler
-    pub fn head<H, T>(mut self, path: &str, handler: H, name: &str) -> Self
+    pub fn head<H, T>(self, path: &str, handler: H, name: &str) -> Self
     where
         H: Handler<T, S>,
         T: 'static,
     {
-        self.name_repo = self.name_repo.register(name, path);
-        self.router = self.router.route(path, head(handler));
-        self
+        self.name_route(path, head(handler), name)
     }
 
     /// Register a OTPIONS handler
-    pub fn opitons<H, T>(mut self, path: &str, handler: H, name: &str) -> Self
+    pub fn opitons<H, T>(self, path: &str, handler: H, name: &str) -> Self
     where
         H: Handler<T, S>,
         T: 'static,
     {
-        self.name_repo = self.name_repo.register(name, path);
-        self.router = self.router.route(path, options(handler));
-        self
+        self.name_route(path, options(handler), name)
     }
 
     /// Register a PATCH handler
-    pub fn patch<H, T>(mut self, path: &str, handler: H, name: &str) -> Self
+    pub fn patch<H, T>(self, path: &str, handler: H, name: &str) -> Self
     where
         H: Handler<T, S>,
         T: 'static,
     {
-        self.name_repo = self.name_repo.register(name, path);
-        self.router = self.router.route(path, patch(handler));
-        self
+        self.name_route(path, patch(handler), name)
     }
 
     /// Register a POST handler
-    pub fn post<H, T>(mut self, path: &str, handler: H, name: &str) -> Self
+    pub fn post<H, T>(self, path: &str, handler: H, name: &str) -> Self
     where
         H: Handler<T, S>,
         T: 'static,
     {
-        self.name_repo = self.name_repo.register(name, path);
-        self.router = self.router.route(path, post(handler));
-        self
+        self.name_route(path, post(handler), name)
     }
 
     /// Register a PUT handler
-    pub fn put<H, T>(mut self, path: &str, handler: H, name: &str) -> Self
+    pub fn put<H, T>(self, path: &str, handler: H, name: &str) -> Self
     where
         H: Handler<T, S>,
         T: 'static,
     {
-        self.name_repo = self.name_repo.register(name, path);
-        self.router = self.router.route(path, put(handler));
-        self
+        self.name_route(path, put(handler), name)
     }
 
     /// Register a TRACE handler
-    pub fn trace<H, T>(mut self, path: &str, handler: H, name: &str) -> Self
+    pub fn trace<H, T>(self, path: &str, handler: H, name: &str) -> Self
     where
         H: Handler<T, S>,
         T: 'static,
     {
-        self.name_repo = self.name_repo.register(name, path);
-        self.router = self.router.route(path, trace(handler));
-        self
+        self.name_route(path, trace(handler), name)
     }
 
     pub fn route(mut self, path: &str, handler: MethodRouter<S>) -> Self {
         self.router = self.router.route(path, handler);
         self
+    }
+
+    pub fn name_route(mut self, path: &str, handler: MethodRouter<S>, name: &str) -> Self {
+        self.name_repo = self.name_repo.register(name, path);
+        self.route(path, handler)
     }
 
     pub fn merge(mut self, wrapper: Self) -> Self {
