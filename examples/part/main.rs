@@ -27,9 +27,9 @@ async fn main() {
 }
 
 async fn handler(State(app): State<AppState>) -> impl IntoResponse {
-    // 3. Get the route with name "add_numbers" and redirect to it
+    // 3. Get the route with name "day" and redirect to it
     if let Some(route) = app.route_service().get("day") {
-        // 4. The route named "add_numbers" as two parts that requires values
+        // 4. The route named "day" requires an i32 value
         // these are the values.
         let part = rand::thread_rng().gen_range(0..6);
 

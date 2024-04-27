@@ -30,10 +30,9 @@ async fn main() {
 }
 
 async fn handler(State(app): State<AppState>) -> impl IntoResponse {
-    // 3. Get the route with name "add_numbers" and redirect to it
+    // 3. Get the route with the name "add_numbers" and redirect to it
     if let Some(route) = app.route_service().get("add_numbers") {
-        // 4. The route named "add_numbers" as two parts that requires values
-        // these are the values
+        // 4. The route named "add_numbers" has two parts. These are the values
         let mut parts = HashMap::new();
         parts.insert("number1", 1);
         parts.insert("number2", 2);
