@@ -50,10 +50,9 @@ async fn main() {
 }
 
 async fn handler(State(app): State<AppState>) -> impl IntoResponse {
-    // 3. Get the route with name "add_numbers" and redirect to it
+    // 3. Get the route with name "day" and redirect to it
     if let Some(route) = app.route_service().get("day") {
-        // 4. The route named "add_numbers" as two parts that requires values
-        // these are the values.
+        // 4. The route named "day" requires a value
         let part = rand::thread_rng().gen_range(0..6);
 
         return route.with(part.to_string()).redirect(Html("")); // we are creating a response with an empty HTML body
