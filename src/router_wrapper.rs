@@ -8,7 +8,7 @@ use crate::NamedRoutesRepo;
 
 /// Axum Router Wrapper
 /// Instead of using Axum's default Router to register routes
-/// this type schould be used
+/// this type should be used
 ///
 /// ```rust
 ///  use named_routes_axum::RouterWrapper;
@@ -67,8 +67,8 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         self.name_route(path, head(handler), name)
     }
 
-    /// Register a OTPIONS handler
-    pub fn opitons<H, T>(self, path: &str, handler: H, name: &str) -> Self
+    /// Register a OPTIONS handler
+    pub fn options<H, T>(self, path: &str, handler: H, name: &str) -> Self
     where
         H: Handler<T, S>,
         T: 'static,
