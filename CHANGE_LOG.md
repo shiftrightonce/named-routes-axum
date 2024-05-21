@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.5] - 2024-05-21
+
+### 🚀 Features
+
+- Add middleware support
+
+### 🐛 Bug Fixes
+
+- Fix typos
+
+### Example
+
+- Add middleware examples
+
 ## [0.1.4] - 2024-04-27
 
 ### 🐛 Bug Fixes
