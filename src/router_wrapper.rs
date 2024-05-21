@@ -1,5 +1,10 @@
+use std::future::Future;
+
 use axum::{
+    extract::{Request, State},
     handler::Handler,
+    middleware::{from_fn_with_state, Next},
+    response::IntoResponse,
     routing::{delete, get, head, options, patch, post, put, trace, MethodRouter},
     Router,
 };
@@ -124,6 +129,29 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
 
     pub fn merge(mut self, wrapper: Self) -> Self {
         self.router = self.router.merge(wrapper.into_router());
+        self
+    }
+
+    pub fn middleware<F, Fut, Out>(mut self, f: F) -> Self
+    where
+        F: FnMut(Request, Next) -> Fut + Clone + Send + 'static,
+        Fut: Future<Output = Out> + Send + 'static,
+        Out: IntoResponse + 'static,
+    {
+        self.router = self.router.route_layer(from_fn_with_state((), f));
+
+        self
+    }
+
+    pub fn middleware_with_state<F, Fut, Out, ST>(mut self, f: F, state: ST) -> Self
+    where
+        F: FnMut(State<ST>, Request, Next) -> Fut + Clone + Send + 'static,
+        Fut: Future<Output = Out> + Send + 'static,
+        Out: IntoResponse + 'static,
+        ST: Clone + Send + Sync + 'static,
+    {
+        self.router = self.router.route_layer(from_fn_with_state(state, f));
+
         self
     }
 
