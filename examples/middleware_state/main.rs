@@ -24,7 +24,7 @@ async fn main() {
             },
             middleware_state.clone(),
         )
-        // 4. Disply the total visittors so far
+        // 4. Display the total visitors so far
         .get("/total", handle_get_count, "get-total")
         // 5. `middleware_two`  provides the middle's state as an "extension"
         .middleware_with_state(middleware_two, middleware_state);

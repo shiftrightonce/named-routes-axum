@@ -35,7 +35,7 @@ async fn handler(State(app): State<AppState>) -> impl IntoResponse {
 
         return route.with(part.to_string()).redirect(Html("")); // we are creating a response with an empty HTML body
     } else {
-        Html("<h1>We could not get the rout named <b>add_numbers</b></h1>").into_response()
+        Html("<h1>We could not get the route named <b>add_numbers</b></h1>").into_response()
     }
 }
 

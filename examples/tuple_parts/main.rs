@@ -32,12 +32,12 @@ async fn handler(State(app): State<AppState>) -> impl IntoResponse {
     if let Some(route) = app.route_service().get("add_numbers") {
         // 4. The route named "add_numbers" takes two i32 values.
         // These are the values. tuple elements are assign to the parts in the order they appear.
-        // In this case 1 is asssign to number1 and 2 to number2
+        // In this case 1 is assign to number1 and 2 to number2
         let parts = (1, 2);
 
         return route.with(parts).redirect(Html("")); // we are creating a response with an empty HTML body
     } else {
-        Html("<h1>We could not get the rout named <b>add_numbers</b></h1>").into_response()
+        Html("<h1>We could not get the route named <b>add_numbers</b></h1>").into_response()
     }
 }
 
