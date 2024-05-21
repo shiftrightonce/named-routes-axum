@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.6] - 2024-05-21
+
+### 🐛 Bug Fixes
+
+- Fix typos in the examples
+
 ## [0.1.5] - 2024-05-21
 
 ### 🚀 Features
