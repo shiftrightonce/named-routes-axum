@@ -237,3 +237,12 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         self.router
     }
 }
+
+impl<S> From<Router<S>> for RouterWrapper<S> {
+    fn from(router: Router<S>) -> Self {
+        Self {
+            router,
+            name_repo: Default::default(),
+        }
+    }
+}
