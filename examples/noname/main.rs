@@ -5,7 +5,7 @@ use named_routes_axum::RouterWrapper;
 async fn main() {
     let app = RouterWrapper::new()
         .get("/", home_handler, "home") // 1. The home route has a name
-        .route("/noname", get(noname_route)) // 2. This route does not have a name
+        .route("/no-name", get(no_name_route)) // 2. This route does not have a name
         .name_route("/awesome", get(awesome_route), "awesome"); // 3. Another named route
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
@@ -20,7 +20,7 @@ async fn home_handler() -> impl IntoResponse {
     "Welcome"
 }
 
-async fn noname_route() -> impl IntoResponse {
+async fn no_name_route() -> impl IntoResponse {
     "This route does not have a name"
 }
 
