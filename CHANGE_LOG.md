@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.8] - 2024-05-25
+
+### 🚀 Features
+
+- Add the ability to nest routers
+
+### Example
+
+- Add an example for nesting routers
+
 ## [0.1.7] - 2024-05-25
 
 ### 🚀 Features
