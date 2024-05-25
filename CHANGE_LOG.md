@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.7] - 2024-05-25
+
+### 🚀 Features
+
+- Add `no name` version for all the verbs
+
+### Example
+
+- Split `noname` for readability
+- Add an example for the new `verb_x` methods
+
 ## [0.1.6] - 2024-05-21
 
 ### 🐛 Bug Fixes
