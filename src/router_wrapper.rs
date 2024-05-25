@@ -54,6 +54,15 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         self.name_route(path, delete(handler), name)
     }
 
+    /// Register a DELETE handler with no name
+    pub fn delete_x<H, T>(self, path: &str, handler: H) -> Self
+    where
+        H: Handler<T, S>,
+        T: 'static,
+    {
+        self.route(path, delete(handler))
+    }
+
     /// Register a GET handler
     pub fn get<H, T>(self, path: &str, handler: H, name: &str) -> Self
     where
@@ -61,6 +70,15 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         T: 'static,
     {
         self.name_route(path, get(handler), name)
+    }
+
+    /// Register a GET handler with no name
+    pub fn get_x<H, T>(self, path: &str, handler: H) -> Self
+    where
+        H: Handler<T, S>,
+        T: 'static,
+    {
+        self.route(path, get(handler))
     }
 
     /// Register a HEAD handler
@@ -72,6 +90,15 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         self.name_route(path, head(handler), name)
     }
 
+    /// Register a HEAD handler with no name
+    pub fn head_x<H, T>(self, path: &str, handler: H) -> Self
+    where
+        H: Handler<T, S>,
+        T: 'static,
+    {
+        self.route(path, head(handler))
+    }
+
     /// Register a OPTIONS handler
     pub fn options<H, T>(self, path: &str, handler: H, name: &str) -> Self
     where
@@ -79,6 +106,15 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         T: 'static,
     {
         self.name_route(path, options(handler), name)
+    }
+
+    /// Register a OPTIONS handler with no name
+    pub fn options_x<H, T>(self, path: &str, handler: H) -> Self
+    where
+        H: Handler<T, S>,
+        T: 'static,
+    {
+        self.route(path, options(handler))
     }
 
     /// Register a PATCH handler
@@ -90,6 +126,15 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         self.name_route(path, patch(handler), name)
     }
 
+    /// Register a PATCH handler with no name
+    pub fn patch_x<H, T>(self, path: &str, handler: H) -> Self
+    where
+        H: Handler<T, S>,
+        T: 'static,
+    {
+        self.route(path, patch(handler))
+    }
+
     /// Register a POST handler
     pub fn post<H, T>(self, path: &str, handler: H, name: &str) -> Self
     where
@@ -97,6 +142,15 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         T: 'static,
     {
         self.name_route(path, post(handler), name)
+    }
+
+    /// Register a POST handler with no name
+    pub fn post_x<H, T>(self, path: &str, handler: H) -> Self
+    where
+        H: Handler<T, S>,
+        T: 'static,
+    {
+        self.route(path, post(handler))
     }
 
     /// Register a PUT handler
@@ -108,6 +162,15 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         self.name_route(path, put(handler), name)
     }
 
+    /// Register a PUT handler with no name
+    pub fn put_x<H, T>(self, path: &str, handler: H) -> Self
+    where
+        H: Handler<T, S>,
+        T: 'static,
+    {
+        self.route(path, put(handler))
+    }
+
     /// Register a TRACE handler
     pub fn trace<H, T>(self, path: &str, handler: H, name: &str) -> Self
     where
@@ -115,6 +178,15 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         T: 'static,
     {
         self.name_route(path, trace(handler), name)
+    }
+
+    /// Register a TRACE handler with no name
+    pub fn trace_x<H, T>(self, path: &str, handler: H) -> Self
+    where
+        H: Handler<T, S>,
+        T: 'static,
+    {
+        self.route(path, trace(handler))
     }
 
     pub fn route(mut self, path: &str, handler: MethodRouter<S>) -> Self {
