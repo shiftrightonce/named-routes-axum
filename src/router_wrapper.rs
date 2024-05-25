@@ -204,6 +204,11 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         self
     }
 
+    pub fn nest(mut self, path: &str, wrapper: Self) -> Self {
+        self.router = self.router.nest(path, wrapper.into_router());
+        self
+    }
+
     pub fn middleware<F, Fut, Out>(mut self, f: F) -> Self
     where
         F: FnMut(Request, Next) -> Fut + Clone + Send + 'static,
