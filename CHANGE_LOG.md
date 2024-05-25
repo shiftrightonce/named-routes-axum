@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.9] - 2024-05-25
+
+### 🚀 Features
+
+- Implemented `from` raw router into router wrapper
+
+### Example
+
+- Add from raw router example
+
 ## [0.1.8] - 2024-05-25
 
 ### 🚀 Features
