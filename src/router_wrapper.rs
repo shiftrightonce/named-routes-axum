@@ -204,9 +204,25 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         self
     }
 
+    /// An new instance of this struct will be passed to the provided callback
+    pub fn merge_given<C>(self, mut callback: C) -> Self
+    where
+        C: FnMut(Self) -> Self,
+    {
+        self.merge(callback(Self::new()))
+    }
+
     pub fn nest(mut self, path: &str, wrapper: Self) -> Self {
         self.router = self.router.nest(path, wrapper.into_router());
         self
+    }
+
+    /// An new instance of this struct will be passed to the provided callback
+    pub fn nest_given<C>(self, path: &str, mut callback: C) -> Self
+    where
+        C: FnMut(Self) -> Self,
+    {
+        self.nest(path, callback(Self::new()))
     }
 
     pub fn middleware<F, Fut, Out>(mut self, f: F) -> Self
