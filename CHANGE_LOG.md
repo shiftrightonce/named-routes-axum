@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.10] - 2024-08-16
+
+### 🚀 Features
+
+- *(injectable instance)* Instance can now be injected
+
+### Example
+
+- *(injected instance)* Add examples of injected instance
+
 ## [0.1.9] - 2024-05-25
 
 ### 🚀 Features
