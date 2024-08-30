@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.11] - 2024-08-30
+
+### 🚀 Features
+
+- Add `any` and `any_of` helpers
+
+### Example
+
+- Add examples for `any` and `any_of` features
+
 ## [0.1.10] - 2024-08-16
 
 ### 🚀 Features
