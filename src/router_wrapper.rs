@@ -189,6 +189,75 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         self.route(path, trace(handler))
     }
 
+    /// Register a named route handler that handles most of the common HTTP verbs:
+    ///  - GET, POST, PUT, DELETE, PATCH , OPTIONS, TRACE
+    pub fn any<H, T>(self, path: &str, handler: H, name: &str) -> Self
+    where
+        H: Handler<T, S>,
+        T: 'static,
+    {
+        self.name_route(
+            path,
+            get(handler.clone())
+                .post(handler.clone())
+                .put(handler.clone())
+                .delete(handler.clone())
+                .patch(handler.clone())
+                .options(handler.clone())
+                .trace(handler.clone()),
+            name,
+        )
+    }
+
+    /// Register a route handler that handles most of the common HTTP verbs:
+    ///  - GET, POST, PUT, DELETE, PATCH , OPTIONS, TRACE
+    pub fn any_x<H, T>(self, path: &str, handler: H) -> Self
+    where
+        H: Handler<T, S>,
+        T: 'static,
+    {
+        self.route(
+            path,
+            get(handler.clone())
+                .post(handler.clone())
+                .put(handler.clone())
+                .delete(handler.clone())
+                .patch(handler.clone())
+                .options(handler.clone())
+                .trace(handler.clone()),
+        )
+    }
+
+    /// Register a named route handler that handles one or more HTTP verbs:
+    pub fn any_of<H, T, V>(self, verbs: &[V], path: &str, handler: H, name: &str) -> Self
+    where
+        H: Handler<T, S>,
+        T: 'static,
+        V: ToString,
+    {
+        if verbs.len() == 0 {
+            return self;
+        }
+        let list = self.build_verb_list(verbs, handler);
+
+        self.name_route(path, list, name)
+    }
+
+    /// Register a route handler that handles one or more HTTP verbs:
+    pub fn any_of_x<H, T, V>(self, verbs: &[V], path: &str, handler: H) -> Self
+    where
+        H: Handler<T, S>,
+        T: 'static,
+        V: ToString,
+    {
+        if verbs.len() == 0 {
+            return self;
+        }
+        let list = self.build_verb_list(verbs, handler);
+
+        self.route(path, list)
+    }
+
     pub fn route(mut self, path: &str, handler: MethodRouter<S>) -> Self {
         self.router = self.router.route(path, handler);
         self
@@ -251,6 +320,30 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
     /// Returns the Axum Router instance
     pub fn into_router(self) -> Router<S> {
         self.router
+    }
+
+    pub fn build_verb_list<H, T, V>(&self, verbs: &[V], handler: H) -> MethodRouter<S>
+    where
+        H: Handler<T, S>,
+        T: 'static,
+        V: ToString,
+    {
+        let mut list: MethodRouter<S> = MethodRouter::new();
+
+        for entry in verbs {
+            list = match entry.to_string().trim().to_ascii_uppercase().as_str() {
+                "GET" => list.get(handler.clone()),
+                "POST" => list.post(handler.clone()),
+                "PUT" => list.put(handler.clone()),
+                "DELETE" => list.delete(handler.clone()),
+                "PATCH" => list.patch(handler.clone()),
+                "OPTION" | "OPTIONS" => list.patch(handler.clone()),
+                "TRACE" => list.trace(handler.clone()),
+                _ => list,
+            };
+        }
+
+        list
     }
 }
 
