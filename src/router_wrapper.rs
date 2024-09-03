@@ -305,6 +305,32 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         self
     }
 
+    /// Register tower's layer service
+    pub fn layer<L>(mut self, layer: L) -> Self
+    where
+        L: Layer<Route> + Clone + Send + 'static,
+        L::Service: Service<Request> + Clone + Send + 'static,
+        <L::Service as Service<Request>>::Response: IntoResponse + 'static,
+        <L::Service as Service<Request>>::Error: Into<Infallible> + 'static,
+        <L::Service as Service<Request>>::Future: Send + 'static,
+    {
+        self.router = self.router.layer(layer);
+        self
+    }
+
+    /// Register tower's router layer service
+    pub fn route_layer<L>(mut self, layer: L) -> Self
+    where
+        L: Layer<Route> + Clone + Send + 'static,
+        L::Service: Service<Request> + Clone + Send + 'static,
+        <L::Service as Service<Request>>::Response: IntoResponse + 'static,
+        <L::Service as Service<Request>>::Error: Into<Infallible> + 'static,
+        <L::Service as Service<Request>>::Future: Send + 'static,
+    {
+        self.router = self.router.route_layer(layer);
+        self
+    }
+
     pub fn middleware_with_state<F, Fut, Out, ST>(mut self, f: F, state: ST) -> Self
     where
         F: FnMut(State<ST>, Request, Next) -> Fut + Clone + Send + 'static,
