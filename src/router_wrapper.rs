@@ -1,13 +1,14 @@
-use std::future::Future;
+use std::{convert::Infallible, future::Future};
 
 use axum::{
     extract::{Request, State},
     handler::Handler,
     middleware::{from_fn_with_state, Next},
     response::IntoResponse,
-    routing::{delete, get, head, options, patch, post, put, trace, MethodRouter},
+    routing::{delete, get, head, options, patch, post, put, trace, MethodRouter, Route},
     Router,
 };
+use tower::{Layer, Service};
 
 use crate::NamedRoutesRepo;
 
