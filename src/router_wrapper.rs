@@ -364,7 +364,7 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
                 "PUT" => list.put(handler.clone()),
                 "DELETE" => list.delete(handler.clone()),
                 "PATCH" => list.patch(handler.clone()),
-                "OPTION" | "OPTIONS" => list.patch(handler.clone()),
+                "OPTION" | "OPTIONS" => list.options(handler.clone()),
                 "TRACE" => list.trace(handler.clone()),
                 _ => list,
             };
