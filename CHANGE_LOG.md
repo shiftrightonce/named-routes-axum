@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.13] - 2024-09-26
+
+### 🐛 Bug Fixes
+
+- Wrong HTTP method type for `OPTIONS`
+
 ## [0.1.12] - 2024-09-03
 
 ### 🐛 Bug Fixes
