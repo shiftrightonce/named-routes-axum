@@ -12,9 +12,9 @@ categories = ["web-programming"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-axum = { version = "0.7.5", features = ["default"] }
-tower = { version = "0.5.0" }
+axum = { version = "0.8.1", features = ["default"] }
+tower = { version = "0.5.2" }
 
 [dev-dependencies]
-tokio = { version = "1.37.0", features = ["full"] }
+tokio = { version = "1.43.0", features = ["full"] }
 rand = "0.8.5"

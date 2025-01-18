@@ -3,7 +3,7 @@ use std::{convert::Infallible, future::Future};
 use axum::{
     extract::{Request, State},
     handler::Handler,
-    middleware::{from_fn_with_state, Next},
+    middleware::{from_fn, from_fn_with_state, Next},
     response::IntoResponse,
     routing::{delete, get, head, options, patch, post, put, trace, MethodRouter, Route},
     Router,
@@ -297,11 +297,11 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
 
     pub fn middleware<F, Fut, Out>(mut self, f: F) -> Self
     where
-        F: FnMut(Request, Next) -> Fut + Clone + Send + 'static,
+        F: FnMut(Request, Next) -> Fut + Clone + Send + Sync + 'static,
         Fut: Future<Output = Out> + Send + 'static,
         Out: IntoResponse + 'static,
     {
-        self.router = self.router.route_layer(from_fn_with_state((), f));
+        self.router = self.router.route_layer(from_fn(f));
 
         self
     }
@@ -309,8 +309,8 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
     /// Register tower's layer service
     pub fn layer<L>(mut self, layer: L) -> Self
     where
-        L: Layer<Route> + Clone + Send + 'static,
-        L::Service: Service<Request> + Clone + Send + 'static,
+        L: Layer<Route> + Clone + Send + Sync + 'static,
+        L::Service: Service<Request> + Clone + Send + Sync + 'static,
         <L::Service as Service<Request>>::Response: IntoResponse + 'static,
         <L::Service as Service<Request>>::Error: Into<Infallible> + 'static,
         <L::Service as Service<Request>>::Future: Send + 'static,
@@ -322,8 +322,8 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
     /// Register tower's router layer service
     pub fn route_layer<L>(mut self, layer: L) -> Self
     where
-        L: Layer<Route> + Clone + Send + 'static,
-        L::Service: Service<Request> + Clone + Send + 'static,
+        L: Layer<Route> + Clone + Send + Sync + 'static,
+        L::Service: Service<Request> + Clone + Send + Sync + 'static,
         <L::Service as Service<Request>>::Response: IntoResponse + 'static,
         <L::Service as Service<Request>>::Error: Into<Infallible> + 'static,
         <L::Service as Service<Request>>::Future: Send + 'static,
@@ -334,7 +334,7 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
 
     pub fn middleware_with_state<F, Fut, Out, ST>(mut self, f: F, state: ST) -> Self
     where
-        F: FnMut(State<ST>, Request, Next) -> Fut + Clone + Send + 'static,
+        F: FnMut(State<ST>, Request, Next) -> Fut + Clone + Send + Sync + 'static,
         Fut: Future<Output = Out> + Send + 'static,
         Out: IntoResponse + 'static,
         ST: Clone + Send + Sync + 'static,
