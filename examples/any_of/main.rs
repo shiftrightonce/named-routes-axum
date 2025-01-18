@@ -12,7 +12,7 @@ async fn main() {
         .any_of_x(&["post", "get"], "/", index_page)
         .any_of(
             &["post", "put", "delete"],
-            "/x/:id",
+            "/x/{id}",
             handle_any_verb_for_x,
             "x-resource",
         );

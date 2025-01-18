@@ -9,7 +9,7 @@ use named_routes_axum::RouterWrapper;
 async fn main() {
     // 1. Setup two routes that will handle all of the most common HTTP's verbs
     let app = RouterWrapper::new().any_x("/", index_page).any(
-        "/x/:id",
+        "/x/{id}",
         handle_any_verb_for_x,
         "x-resource",
     );

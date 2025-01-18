@@ -13,7 +13,7 @@ async fn main() {
     // 2.  build our application with a route
     let app = RouterWrapper::new()
         .get("/", handler, "home")
-        .get("/day/:index", handle_day, "day");
+        .get("/day/{index}", handle_day, "day");
 
     // run it
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")

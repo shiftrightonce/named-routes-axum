@@ -11,7 +11,7 @@ async fn main() {
 
     // 2.  build our application with a route
     let app = RouterWrapper::new().get("/", handler, "home").get(
-        "/add/:number1/:number2",
+        "/add/{number1}/{number2}",
         handle_adding,
         "add_numbers",
     );
