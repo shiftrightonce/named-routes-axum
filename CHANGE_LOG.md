@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2025-01-18
+
+### 🚀 Features
+
+- *(upgrade to 0.2.0)* Upgrade version to 0.2.0
+
+### 🐛 Bug Fixes
+
+- *(axum 0.8)* Upgrade to axum 0.8
+
+### Example
+
+- Update examples to work with axum 0.8 version
+
 ## [0.1.13] - 2024-09-26
 
 ### 🐛 Bug Fixes
