@@ -79,7 +79,7 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         H: Handler<T, S>,
         T: 'static,
     {
-        self.route(path, get(handler))
+        self.get(path, handler, path)
     }
 
     /// Register a HEAD handler
@@ -97,7 +97,7 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         H: Handler<T, S>,
         T: 'static,
     {
-        self.route(path, head(handler))
+        self.head(path, handler, path)
     }
 
     /// Register a OPTIONS handler
@@ -115,7 +115,7 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         H: Handler<T, S>,
         T: 'static,
     {
-        self.route(path, options(handler))
+        self.options(path, handler, path)
     }
 
     /// Register a PATCH handler
@@ -133,7 +133,7 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         H: Handler<T, S>,
         T: 'static,
     {
-        self.route(path, patch(handler))
+        self.patch(path, handler, path)
     }
 
     /// Register a POST handler
@@ -151,7 +151,7 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         H: Handler<T, S>,
         T: 'static,
     {
-        self.route(path, post(handler))
+        self.post(path, handler, path)
     }
 
     /// Register a PUT handler
@@ -169,7 +169,7 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         H: Handler<T, S>,
         T: 'static,
     {
-        self.route(path, put(handler))
+        self.put(path, handler, path)
     }
 
     /// Register a TRACE handler
@@ -187,7 +187,7 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         H: Handler<T, S>,
         T: 'static,
     {
-        self.route(path, trace(handler))
+        self.trace(path, handler, path)
     }
 
     /// Register a named route handler that handles most of the common HTTP verbs:
@@ -217,16 +217,7 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         H: Handler<T, S>,
         T: 'static,
     {
-        self.route(
-            path,
-            get(handler.clone())
-                .post(handler.clone())
-                .put(handler.clone())
-                .delete(handler.clone())
-                .patch(handler.clone())
-                .options(handler.clone())
-                .trace(handler.clone()),
-        )
+        self.any(path, handler, path)
     }
 
     /// Register a named route handler that handles one or more HTTP verbs:
@@ -251,12 +242,7 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         T: 'static,
         V: ToString,
     {
-        if verbs.len() == 0 {
-            return self;
-        }
-        let list = self.build_verb_list(verbs, handler);
-
-        self.route(path, list)
+        self.any_of(verbs, path, handler, path)
     }
 
     pub fn route(mut self, path: &str, handler: MethodRouter<S>) -> Self {
@@ -264,8 +250,8 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         self
     }
 
-    pub fn name_route(mut self, path: &str, handler: MethodRouter<S>, name: &str) -> Self {
-        self.name_repo = self.name_repo.register(name, path);
+    pub fn name_route(self, path: &str, handler: MethodRouter<S>, name: &str) -> Self {
+        self.name_repo.register(name, path);
         self.route(path, handler)
     }
 
