@@ -31,9 +31,9 @@ async fn handler(State(app): State<AppState>) -> impl IntoResponse {
     if let Some(route) = app.route_service().get("day") {
         // 4. The route named "day" requires an i32 value
         // these are the values.
-        let part = rand::thread_rng().gen_range(0..6);
+        let part = rand::rng().random_range(0..6);
 
-        return route.with(part.to_string()).redirect(Html("")); // we are creating a response with an empty HTML body
+        return route.with(part.to_string()).redirect(()); // we are creating a response with an empty body
     } else {
         Html("<h1>We could not get the route named <b>add_numbers</b></h1>").into_response()
     }
