@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] - 2025-02-10
+
+### 🚀 Features
+
+- Use the path as the name for unnamed routes
+- Add a method for empty redirect
+- Change to new axum path demarcator
+
+### 🐛 Bug Fixes
+
+- Take a ref instead of ownership
+
+### Example
+
+- Add more tests and update existing ones
+- Update random crate call
+
 ## [0.2.0] - 2025-01-18
 
 ### 🚀 Features
