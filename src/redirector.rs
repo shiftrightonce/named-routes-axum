@@ -32,6 +32,10 @@ impl Redirector {
         response
     }
 
+    pub fn empty_redirect(&self) -> Response<Body> {
+        self.redirect(())
+    }
+
     /// Returns an html meta tag with a refresh
     ///
     /// ```html
