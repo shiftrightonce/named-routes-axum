@@ -36,7 +36,7 @@ async fn main() {
     // 2.  build our application with a route
     let app = RouterWrapper::new()
         .get("/", handler, "home")
-        .get("/day/:index", handle_day, "day");
+        .get("/day/{index}", handle_day, "day");
 
     // run it
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
@@ -53,7 +53,7 @@ async fn handler(State(app): State<AppState>) -> impl IntoResponse {
     // 3. Get the route with name "day" and redirect to it
     if let Some(route) = app.route_service().get("day") {
         // 4. The route named "day" requires a value
-        let part = rand::thread_rng().gen_range(0..6);
+        let part = rand::rng().random_range(0..6);
 
         return route.with(part.to_string()).redirect(Html("")); // we are creating a response with an empty HTML body
 
