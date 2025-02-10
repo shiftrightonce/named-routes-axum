@@ -27,7 +27,7 @@ impl NamedRoutesService {
 
     pub fn get(&self, name: &str) -> Option<RoutePath> {
         if let Ok(read) = self.repo.read() {
-            return read.get(name).cloned();
+            read.get(name).cloned()
         } else {
             None
         }
