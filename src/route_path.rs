@@ -23,7 +23,12 @@ impl RoutePath {
         if parts.pos.is_some() {
             let map = parts.pos.unwrap();
             let mut named_map = HashMap::new();
-            for (pos, name) in self.raw.split('/').filter(|p| p.contains(':')).enumerate() {
+            for (pos, name) in self
+                .raw
+                .split('/')
+                .filter(|p| p.starts_with('{') && p.ends_with('}'))
+                .enumerate()
+            {
                 let value = if let Some(v) = map.get(&pos) {
                     v.clone()
                 } else {
@@ -39,7 +44,7 @@ impl RoutePath {
                     .name
                     .unwrap()
                     .into_iter()
-                    .map(|(k, v)| (format!(":{}", k), v.to_string()))
+                    .map(|(k, v)| (format!("{{{}}}", k), v.to_string()))
                     .collect(),
             ))
         }
@@ -74,7 +79,28 @@ impl From<&str> for RoutePath {
     fn from(value: &str) -> Self {
         Self {
             raw: value.to_string(),
-            has_parts: value.contains(':'),
+            has_parts: value
+                .split('/')
+                .filter(|v| v.starts_with('{') && v.ends_with('}'))
+                .next()
+                .is_some(),
+        }
+    }
+}
+
+impl From<String> for RoutePath {
+    fn from(value: String) -> Self {
+        value.as_str().into()
+    }
+}
+
+impl From<&str> for PartsValue {
+    fn from(value: &str) -> Self {
+        let mut map = BTreeMap::new();
+        map.insert(0, value.to_string());
+        PartsValue {
+            pos: Some(map),
+            name: None,
         }
     }
 }
@@ -83,17 +109,6 @@ impl From<String> for PartsValue {
     fn from(value: String) -> Self {
         let mut map = BTreeMap::new();
         map.insert(0, value);
-        PartsValue {
-            pos: Some(map),
-            name: None,
-        }
-    }
-}
-
-impl From<&str> for PartsValue {
-    fn from(value: &str) -> Self {
-        let mut map = BTreeMap::new();
-        map.insert(0, value.to_string());
         PartsValue {
             pos: Some(map),
             name: None,
