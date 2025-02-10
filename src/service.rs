@@ -59,45 +59,38 @@ impl NamedRoutesService {
 }
 
 #[allow(unused_imports)]
+#[cfg(test)]
 mod test {
     use crate::{NamedRoutesRepo, NamedRoutesService};
 
+    const HOME_URL: (&'static str, &'static str) = ("home", "/");
+    const URL2: (&'static str, &'static str) = ("url_2", "/first");
+    const URL3: (&'static str, &'static str) = ("url_3", "/second");
+    const URL4: (&'static str, &'static str) = ("url_4", "/four/{path1}/{path2}");
+    const URL5: (&'static str, &'static str) = ("url_5", "/four/{path1}/{path2}/user/{path3}");
+
     #[allow(unused)]
     fn setup_name_repo() {
-        let home_url = "/".to_string();
-        let first_url = "/first".to_string();
-        let second_url = "/second".to_string();
-
-        NamedRoutesRepo::new()
-            .register("home", &home_url)
-            .register("first", &first_url)
-            .register("second", &second_url);
+        NamedRoutesRepo::default()
+            .register(HOME_URL.0, &HOME_URL.1)
+            .register(URL2.0, &URL2.1)
+            .register(URL3.0, &URL3.1)
+            .register(URL4.0, &URL4.1)
+            .register(URL5.0, &URL5.1);
     }
 
     #[test]
     fn test_registering() {
-        let home_url = "/".to_string();
-        let first_url = "/first".to_string();
-        let second_url = "/second".to_string();
         setup_name_repo();
         let name_service = NamedRoutesService::new();
 
         // success tests
         assert_eq!(
-            name_service.get_path("home"),
-            Some(home_url.clone()),
-            "expected /home"
+            name_service.get_path(HOME_URL.0),
+            Some(HOME_URL.1.to_string()),
         );
-        assert_eq!(
-            name_service.get_path("first"),
-            Some(first_url.clone()),
-            "expected /first"
-        );
-        assert_eq!(
-            name_service.get_path("second"),
-            Some(second_url.clone()),
-            "expected /second"
-        );
+        assert_eq!(name_service.get_path(URL2.0), Some(URL2.1.to_owned()),);
+        assert_eq!(name_service.get_path(URL3.0), Some(URL3.1.to_string()),);
 
         // fail tests
         assert_eq!(
@@ -119,9 +112,12 @@ mod test {
         let name_service = NamedRoutesService::new();
 
         // success test
-        assert_eq!(name_service.get_path("home"), Some("/".to_string()));
-        assert_eq!(name_service.get_path("first"), Some("/first".to_string()));
-        assert_eq!(name_service.get_path("second"), Some("/second".to_string()));
+        assert_eq!(
+            name_service.get_path(HOME_URL.0),
+            Some(HOME_URL.1.to_string())
+        );
+        assert_eq!(name_service.get_path(URL2.0), Some(URL2.1.to_string()));
+        assert_eq!(name_service.get_path(URL3.0), Some(URL3.1.to_string()));
         assert_eq!(name_service.get_path("second-foo"), None);
     }
 
@@ -132,7 +128,7 @@ mod test {
         let all = name_service.all();
 
         // success
-        assert_eq!(all.len(), 3);
+        assert_eq!(all.len(), 5);
     }
 
     #[test]
@@ -141,12 +137,12 @@ mod test {
         let name_service2 = NamedRoutesService::new();
 
         // success test
-        assert_eq!(name_service2.get_path("home"), Some("/".to_string()));
-        assert_eq!(name_service2.get_path("first"), Some("/first".to_string()));
         assert_eq!(
-            name_service2.get_path("second"),
-            Some("/second".to_string())
+            name_service2.get_path(HOME_URL.0),
+            Some(HOME_URL.1.to_string())
         );
+        assert_eq!(name_service2.get_path(URL2.0), Some(URL2.1.to_string()));
+        assert_eq!(name_service2.get_path(URL3.0), Some(URL3.1.to_string()));
         assert_eq!(name_service2.get_path("second-foo"), None);
 
         // fail test

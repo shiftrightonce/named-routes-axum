@@ -64,10 +64,58 @@ impl Redirector {
         let mut raw = self.raw.clone();
         if self.parts.is_some() {
             for (k, v) in self.parts.as_ref().unwrap().iter() {
-                raw = raw.replace(k, v);
+                let name = if k.starts_with('{') && k.ends_with('}') {
+                    k
+                } else {
+                    &format!("{{{}}}", k)
+                };
+                raw = raw.replace(name, v);
             }
         }
 
         raw
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::Redirector;
+    use std::collections::HashMap;
+
+    #[test]
+    fn test_path_with_no_parts() {
+        let mut parts = HashMap::new();
+        parts.insert("{yahoo}".to_string(), "google".to_string());
+
+        let redirector = Redirector::new("/yahoo", Some(parts));
+        assert_eq!(redirector.path().as_str(), "/yahoo");
+    }
+
+    #[test]
+    fn test_path_with_a_part() {
+        let mut parts = HashMap::new();
+        parts.insert("yahoo".to_string(), "google".to_string());
+
+        let redirector = Redirector::new("/{yahoo}", Some(parts));
+        assert_eq!(redirector.path().as_str(), "/google");
+    }
+
+    #[test]
+    fn test_path_with_parts() {
+        let mut parts = HashMap::new();
+        parts.insert("user_id".to_string(), "1234".to_string());
+        parts.insert("product_id".to_string(), "4567".to_string());
+
+        let redirector = Redirector::new("/user/{user_id}/product/{product_id}", Some(parts));
+        assert_eq!(redirector.path().as_str(), "/user/1234/product/4567");
+    }
+
+    #[test]
+    fn test_path_with_duplicate_parts() {
+        let mut parts = HashMap::new();
+        parts.insert("id".to_string(), "1234".to_string());
+
+        let redirector = Redirector::new("/user/{id}/{id}", Some(parts));
+        assert_eq!(redirector.path().as_str(), "/user/1234/1234");
     }
 }

@@ -187,3 +187,139 @@ impl<V: ToString> From<(V, V, V, V)> for PartsValue {
         }
     }
 }
+
+// TODO: Remove when proc_macro is implemented
+impl<V: ToString> From<(V, V, V, V, V)> for PartsValue {
+    fn from(value: (V, V, V, V, V)) -> Self {
+        let mut map = BTreeMap::new();
+        map.insert(0, value.0.to_string());
+        map.insert(1, value.1.to_string());
+        map.insert(2, value.2.to_string());
+        map.insert(3, value.3.to_string());
+        map.insert(4, value.4.to_string());
+
+        Self {
+            pos: Some(map),
+            name: None,
+        }
+    }
+}
+
+// TODO: Remove when proc_macro is implemented
+impl<V: ToString> From<(V, V, V, V, V, V)> for PartsValue {
+    fn from(value: (V, V, V, V, V, V)) -> Self {
+        let mut map = BTreeMap::new();
+        map.insert(0, value.0.to_string());
+        map.insert(1, value.1.to_string());
+        map.insert(2, value.2.to_string());
+        map.insert(3, value.3.to_string());
+        map.insert(4, value.4.to_string());
+        map.insert(5, value.5.to_string());
+
+        Self {
+            pos: Some(map),
+            name: None,
+        }
+    }
+}
+
+// TODO: Remove when proc_macro is implemented
+impl<V: ToString> From<(V, V, V, V, V, V, V)> for PartsValue {
+    fn from(value: (V, V, V, V, V, V, V)) -> Self {
+        let mut map = BTreeMap::new();
+        map.insert(0, value.0.to_string());
+        map.insert(1, value.1.to_string());
+        map.insert(2, value.2.to_string());
+        map.insert(3, value.3.to_string());
+        map.insert(4, value.4.to_string());
+        map.insert(5, value.5.to_string());
+        map.insert(6, value.6.to_string());
+
+        Self {
+            pos: Some(map),
+            name: None,
+        }
+    }
+}
+
+// TODO: Remove when proc_macro is implemented
+impl<V: ToString> From<(V, V, V, V, V, V, V, V)> for PartsValue {
+    fn from(value: (V, V, V, V, V, V, V, V)) -> Self {
+        let mut map = BTreeMap::new();
+        map.insert(0, value.0.to_string());
+        map.insert(1, value.1.to_string());
+        map.insert(2, value.2.to_string());
+        map.insert(3, value.3.to_string());
+        map.insert(4, value.4.to_string());
+        map.insert(5, value.5.to_string());
+        map.insert(6, value.6.to_string());
+        map.insert(7, value.7.to_string());
+
+        Self {
+            pos: Some(map),
+            name: None,
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use std::collections::HashMap;
+
+    use super::{PartsValue, RoutePath};
+
+    #[test]
+    fn test_string_to_route_path() {
+        let path = RoutePath::from("/a/{b}");
+
+        assert_eq!(path.has_parts(), true);
+    }
+
+    #[test]
+    fn test_string_to_part_values() {
+        let value = PartsValue::from("one");
+        assert_eq!(value.pos.is_some(), true);
+        assert_eq!(value.pos.unwrap().get(&0).cloned(), Some("one".to_string()));
+    }
+
+    #[test]
+    fn test_tuple_to_part_values() {
+        let value = PartsValue::from((1, 2));
+        assert_eq!(
+            value.pos.as_ref().unwrap().get(&0).cloned(),
+            Some("1".to_string())
+        );
+        assert_eq!(value.pos.unwrap().get(&1).cloned(), Some("2".to_string()));
+    }
+
+    #[test]
+    fn test_vec_to_part_values() {
+        let value = PartsValue::from(vec![100, 200]);
+        assert_eq!(
+            value.pos.as_ref().unwrap().get(&0).cloned(),
+            Some("100".to_string())
+        );
+        assert_eq!(value.pos.unwrap().get(&1).cloned(), Some("200".to_string()));
+    }
+
+    #[test]
+    fn test_hashmap_to_part_values() {
+        let mut map = HashMap::new();
+        map.insert("a", 120);
+        map.insert("b", 240);
+
+        let value = PartsValue::from(map);
+
+        assert_eq!(value.pos.is_none(), true);
+        assert_eq!(value.name.is_some(), true);
+
+        assert_eq!(
+            value.name.as_ref().unwrap().get("a").cloned(),
+            Some("120".to_string())
+        );
+        assert_eq!(
+            value.name.unwrap().get("b").cloned(),
+            Some("240".to_string())
+        );
+    }
+}
