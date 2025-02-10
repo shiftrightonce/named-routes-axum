@@ -17,4 +17,4 @@ tower = { version = "0.5.2" }
 
 [dev-dependencies]
 tokio = { version = "1.43.0", features = ["full"] }
-rand = "0.8.5"
+rand = "0.9"
