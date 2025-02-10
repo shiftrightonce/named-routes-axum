@@ -21,14 +21,11 @@ impl Default for NamedRoutesRepo {
 }
 
 impl NamedRoutesRepo {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn register(self, name: &str, url: &str) -> Self {
+    pub fn register(&self, name: &str, url: &str) -> &Self {
         if let Ok(mut write_lock) = self.repo.write() {
             write_lock.insert(name.to_string(), url.into());
         }
+
         self
     }
 }
