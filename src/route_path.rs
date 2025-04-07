@@ -81,9 +81,7 @@ impl From<&str> for RoutePath {
             raw: value.to_string(),
             has_parts: value
                 .split('/')
-                .filter(|v| v.starts_with('{') && v.ends_with('}'))
-                .next()
-                .is_some(),
+                .any(|v| v.starts_with('{') && v.ends_with('}')),
         }
     }
 }

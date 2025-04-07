@@ -46,6 +46,13 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         Self::default()
     }
 
+    pub fn new_with_prefix(prefix: Option<&str>) -> Self {
+        Self {
+            router: Router::new(),
+            name_repo: NamedRoutesRepo::new(prefix),
+        }
+    }
+
     /// Register a DELETE handler
     pub fn delete<H, T>(self, path: &str, handler: H, name: &str) -> Self
     where
@@ -227,7 +234,7 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         T: 'static,
         V: ToString,
     {
-        if verbs.len() == 0 {
+        if verbs.is_empty() {
             return self;
         }
         let list = self.build_verb_list(verbs, handler);
@@ -278,7 +285,11 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
     where
         C: FnMut(Self) -> Self,
     {
-        self.nest(path, callback(Self::new()))
+        let full_path = self.name_repo.build_child_prefix(path);
+        self.nest(
+            path,
+            callback(Self::new_with_prefix(Some(full_path.as_str()))),
+        )
     }
 
     pub fn middleware<F, Fut, Out>(mut self, f: F) -> Self
