@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.2] - 2025-04-07
+
+### 🐛 Bug Fixes
+
+- *(route path)* Build nested path correctly
+
 ## [0.2.1] - 2025-02-10
 
 ### 🚀 Features
