@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.3] - 2025-05-22
+
+### 🐛 Bug Fixes
+
+- *(merge root path)* Merge instead of nesting root paths
+
 ## [0.2.2] - 2025-04-07
 
 ### 🐛 Bug Fixes
