@@ -276,7 +276,11 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
     }
 
     pub fn nest(mut self, path: &str, wrapper: Self) -> Self {
-        self.router = self.router.nest(path, wrapper.into_router());
+        if path == "/" {
+            self.router = self.router.merge(wrapper.into_router());
+        } else {
+            self.router = self.router.nest(path, wrapper.into_router());
+        }
         self
     }
 
