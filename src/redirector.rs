@@ -20,7 +20,7 @@ impl Redirector {
         }
     }
 
-    /// Returns a reponse instance that will temporarily redirects client
+    /// Returns a reponse instance that will found/302 redirects client
     pub fn redirect<T: IntoResponse>(&self, response: T) -> Response<Body> {
         let mut response = response.into_response();
 
@@ -28,7 +28,7 @@ impl Redirector {
             header::LOCATION,
             header::HeaderValue::from_str(self.path().as_str()).unwrap(),
         );
-        *response.status_mut() = StatusCode::TEMPORARY_REDIRECT;
+        *response.status_mut() = StatusCode::FOUND;
         response
     }
 
@@ -54,7 +54,7 @@ impl Redirector {
                 header::LOCATION,
                 header::HeaderValue::from_str(self.path().as_str()).unwrap(),
             )
-            .status(StatusCode::TEMPORARY_REDIRECT)
+            .status(StatusCode::FOUND)
             .body(body)
             .unwrap()
     }
