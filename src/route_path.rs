@@ -17,6 +17,52 @@ pub struct PartsValue {
     pos: Option<BTreeMap<usize, String>>,
     name: Option<HashMap<String, String>>,
 }
+
+impl PartsValue {
+    /// Create a new PartsValue where values in `other` overwrite values in this PartsValue.
+    pub fn merge(&self, other: &Self) -> Self {
+        let Self {
+            pos: left_pos,
+            name: left_name,
+        } = self;
+
+        let Self {
+            pos: right_pos,
+            name: right_name,
+        } = other;
+
+        let pos = match (left_pos, right_pos) {
+            (None, None) => None,
+            (None, Some(pos)) => Some(pos.clone()),
+            (Some(pos), None) => Some(pos.clone()),
+            (Some(left), Some(right)) => {
+                let pos = right.iter().fold(left.clone(), |mut acc, (key, value)| {
+                    acc.insert(*key, value.clone());
+                    acc
+                });
+
+                Some(pos)
+            }
+        };
+
+        let name = match (left_name, right_name) {
+            (None, None) => None,
+            (None, Some(name)) => Some(name.clone()),
+            (Some(name), None) => Some(name.clone()),
+            (Some(left), Some(right)) => {
+                let name = right.iter().fold(left.clone(), |mut acc, (key, value)| {
+                    acc.insert(key.clone(), value.clone());
+                    acc
+                });
+
+                Some(name)
+            }
+        };
+
+        Self { pos, name }
+    }
+}
+
 impl RoutePath {
     pub fn with<P: Into<PartsValue>>(&self, values: P) -> Redirector {
         let parts = values.into();
@@ -277,7 +323,7 @@ impl<V: ToString> From<(V, V, V, V, V, V, V, V)> for PartsValue {
 
 #[cfg(test)]
 mod test {
-    use std::collections::HashMap;
+    use std::collections::{BTreeMap, HashMap};
 
     use super::{PartsValue, RoutePath};
 
@@ -333,6 +379,60 @@ mod test {
         assert_eq!(
             value.name.unwrap().get("b").cloned(),
             Some("240".to_string())
+        );
+    }
+
+    #[test]
+    fn test_part_value_merge() {
+        let mut left = HashMap::new();
+        left.insert("a", 120);
+        left.insert("b", 240);
+        let left_named = PartsValue::from(left);
+
+        let mut right = HashMap::new();
+        right.insert("b", 360);
+        right.insert("c", 480);
+        let right_named = PartsValue::from(right);
+
+        let named = left_named.merge(&right_named);
+
+        let left_pos = PartsValue::from(vec!["a", "b"]);
+        let mut right = BTreeMap::new();
+        right.insert(1, "x".to_string());
+        right.insert(2, "y".to_string());
+        let right_pos = PartsValue {
+            pos: Some(right),
+            name: None,
+        };
+
+        let pos = left_pos.merge(&right_pos);
+
+        let merged = named.merge(&pos);
+
+        assert_eq!(
+            merged.name.as_ref().unwrap().get("a").cloned(),
+            Some("120".to_string())
+        );
+        assert_eq!(
+            merged.name.as_ref().unwrap().get("b").cloned(),
+            Some("360".to_string())
+        );
+        assert_eq!(
+            merged.name.unwrap().get("c").cloned(),
+            Some("480".to_string())
+        );
+
+        assert_eq!(
+            merged.pos.as_ref().unwrap().get(&0).cloned(),
+            Some("a".to_string())
+        );
+        assert_eq!(
+            merged.pos.as_ref().unwrap().get(&1).cloned(),
+            Some("x".to_string())
+        );
+        assert_eq!(
+            merged.pos.as_ref().unwrap().get(&2).cloned(),
+            Some("y".to_string())
         );
     }
 }
