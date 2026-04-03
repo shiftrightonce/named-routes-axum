@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.6] - 2026-04-03
+
+### 🚀 Features
+
+- Add the ability to get the inner axum's router
+
+### Example
+
+- Add a `given_inner` example
+- *(part)* Fix `rand` changes
+
 ## [0.2.4] - 2025-08-13
 
 ### 🐛 Bug Fixes
