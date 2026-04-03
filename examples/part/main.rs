@@ -3,7 +3,7 @@ use axum::{
     response::{Html, IntoResponse},
 };
 use named_routes_axum::{NamedRoutesService, RouterWrapper};
-use rand::Rng;
+use rand::RngExt;
 
 #[tokio::main]
 async fn main() {
