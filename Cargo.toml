@@ -1,6 +1,6 @@
 [package]
 name = "named_routes_axum"
-version = "0.2.5"
+version = "0.2.6"
 edition = "2021"
 license = "MIT"
 description = "Give Axum routes names"
@@ -12,9 +12,9 @@ categories = ["web-programming"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-axum = { version = "0.8.1", features = ["default"] }
-tower = { version = "0.5.2" }
+axum = { version = "0.8.8", features = ["default"] }
+tower = { version = "0.5.3" }
 
 [dev-dependencies]
-tokio = { version = "1.43.0", features = ["full"] }
-rand = "0.9"
+tokio = { version = "1.50.0", features = ["full"] }
+rand = "0.10"
