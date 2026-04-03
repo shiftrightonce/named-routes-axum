@@ -333,6 +333,16 @@ impl<S: Clone + Send + Sync + 'static> RouterWrapper<S> {
         self
     }
 
+    /// Provides the inner Axum's Router to the callback
+    pub fn given_inner<F>(mut self, callback: F) -> Self
+    where
+        F: Fn(Router<S>) -> Router<S>,
+    {
+        self.router = callback(self.router);
+
+        self
+    }
+
     pub fn middleware_with_state<F, Fut, Out, ST>(mut self, f: F, state: ST) -> Self
     where
         F: FnMut(State<ST>, Request, Next) -> Fut + Clone + Send + Sync + 'static,
